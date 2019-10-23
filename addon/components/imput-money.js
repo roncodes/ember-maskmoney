@@ -1,6 +1,7 @@
-import { once } from '@ember/runloop';
-import { observer, computed } from '@ember/object';
 import TextField from '@ember/component/text-field';
+import { once } from '@ember/runloop';
+import { observer, computed, set, get } from '@ember/object';
+import $ from 'jquery';
 
 export default TextField.extend({
   prefix: '',
@@ -15,22 +16,22 @@ export default TextField.extend({
 
   options: computed('prefix', 'suffix', 'affixesStay', 'thousands', 'decimal', 'precision', 'allowZero', 'allowNegative', 'allowDecimal', function() {
     return {
-      prefix: this.get('prefix'),
-      suffix: this.get('suffix'),
-      affixesStay: this.get('affixesStay'),
-      thousands: this.get('thousands'),
-      decimal: this.get('decimal'),
-      precision: this.get('precision'),
-      allowZero: this.get('allowZero'),
-      allowNegative: this.get('allowNegative'),
-      allowDecimal: this.get('allowDecimal')
+      prefix: get(this, 'prefix'),
+      suffix: get(this, 'suffix'),
+      affixesStay: get(this, 'affixesStay'),
+      thousands: get(this, 'thousands'),
+      decimal: get(this, 'decimal'),
+      precision: get(this, 'precision'),
+      allowZero: get(this, 'allowZero'),
+      allowNegative: get(this, 'allowNegative'),
+      allowDecimal: get(this, 'allowDecimal')
     };
   }),
 
   didInsertElement() {
     once(() => {
-      this.$().maskMoney(this.get('options'));
-      if((this.get('allowZero') && (this.get('number') !== undefined)) || this.get('number')){
+      $(this.element).maskMoney(get(this, 'options'));
+      if((get(this, 'allowZero') && (get(this, 'number') !== undefined)) || get(this, 'number')){
         this.notifyPropertyChange('number');
       }
     });
@@ -38,27 +39,27 @@ export default TextField.extend({
   },
 
   willDestroyElement() {
-    this.$().maskMoney('destroy');
+    $(this.element).maskMoney('destroy');
     this._super(...arguments);
   },
 
   setMask: observer('options', function(){
-    this.$().maskMoney(this.get('options'));
-    this.$().maskMoney('mask');
+    $(this.element).maskMoney(get(this, 'options'));
+    $(this.element).maskMoney('mask');
   }),
 
   setMaskedValue: observer('number', 'precision', 'decimal', function(){
-    let number = parseFloat(this.get('number') || 0).toFixed(this.get('precision'));
-    let val = number.toString().replace('.', this.get('decimal'));
-    this.$().val(val);
-    this.$().maskMoney('mask');
+    let number = parseFloat(get(this, 'number') || 0).toFixed(get(this, 'precision'));
+    let val = number.toString().replace('.', get(this, 'decimal'));
+    $(this.element).val(val);
+    $(this.element).maskMoney('mask');
   }),
 
   setUnmaskedValue: observer('value', 'allowDecimal', function() {
-    if(this.get('allowDecimal')){
-      this.set('number', this.$().maskMoney('unmasked')[0]);
+    if(get(this, 'allowDecimal')){
+      set(this, 'number', $(this.element).maskMoney('unmasked')[0]);
     } else {
-      this.set('number', this.get('value').replace(/[^0-9]/g, ''));
+      set(this, 'number', get(this, 'value').replace(/[^0-9]/g, ''));
     }
   })
 });
