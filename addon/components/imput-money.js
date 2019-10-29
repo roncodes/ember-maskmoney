@@ -1,7 +1,7 @@
 import TextField from '@ember/component/text-field';
 import { once } from '@ember/runloop';
 import { observer, computed, set, get } from '@ember/object';
-import $ from 'jquery';
+import jQuery from 'jquery';
 
 export default TextField.extend({
   prefix: '',
@@ -30,7 +30,7 @@ export default TextField.extend({
 
   didInsertElement() {
     once(() => {
-      $(this.element).maskMoney(get(this, 'options'));
+      jQuery(this.element).maskMoney(get(this, 'options'));
       if((get(this, 'allowZero') && (get(this, 'number') !== undefined)) || get(this, 'number')){
         this.notifyPropertyChange('number');
       }
@@ -39,25 +39,25 @@ export default TextField.extend({
   },
 
   willDestroyElement() {
-    $(this.element).maskMoney('destroy');
+    jQuery(this.element).maskMoney('destroy');
     this._super(...arguments);
   },
 
   setMask: observer('options', function(){
-    $(this.element).maskMoney(get(this, 'options'));
-    $(this.element).maskMoney('mask');
+    jQuery(this.element).maskMoney(get(this, 'options'));
+    jQuery(this.element).maskMoney('mask');
   }),
 
   setMaskedValue: observer('number', 'precision', 'decimal', function(){
     let number = parseFloat(get(this, 'number') || 0).toFixed(get(this, 'precision'));
     let val = number.toString().replace('.', get(this, 'decimal'));
-    $(this.element).val(val);
-    $(this.element).maskMoney('mask');
+    jQuery(this.element).val(val);
+    jQuery(this.element).maskMoney('mask');
   }),
 
   setUnmaskedValue: observer('value', 'allowDecimal', function() {
     if(get(this, 'allowDecimal')){
-      set(this, 'number', $(this.element).maskMoney('unmasked')[0]);
+      set(this, 'number', jQuery(this.element).maskMoney('unmasked')[0]);
     } else {
       set(this, 'number', get(this, 'value').replace(/[^0-9]/g, ''));
     }
