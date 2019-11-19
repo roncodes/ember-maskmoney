@@ -1,7 +1,9 @@
 import TextField from '@ember/component/text-field';
 import { once } from '@ember/runloop';
 import { observer, computed, set, get } from '@ember/object';
-import jQuery from 'jquery';
+import $ from 'jquery';
+
+const jQuery = $ || window.$;
 
 export default TextField.extend({
   prefix: '',
